@@ -11,6 +11,7 @@
 	<groupId>com.warehouse</groupId>
 	<artifactId>saga-implementation</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
 	<name>saga-implementation</name>
 	<description>Warehouse-service</description>
 	<properties>
@@ -42,6 +43,7 @@
 		<module>chart-service</module>
 		<module>purchase-service</module>
 		<module>warehouse-service</module>
+<!--		<module>eureka-server-end</module>-->
 	</modules>
 
 </project>

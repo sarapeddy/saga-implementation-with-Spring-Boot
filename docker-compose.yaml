@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  postgres-chart:
+    image: postgres:16
+    container_name: postgres_chart_container
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: jdbc_schema
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  postgres-purchase:
+    image: postgres:16
+    container_name: postgres_purchase_container
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: jdbc_schema
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  postgres-warehouse:
+    image: postgres:16
+    container_name: postgres_warehouse_container
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: jdbc_schema
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+
+volumes:
+  pg-data:
+  pgadmin-data:
