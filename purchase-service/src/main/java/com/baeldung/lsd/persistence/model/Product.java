@@ -1,20 +1,15 @@
 package com.baeldung.lsd.persistence.model;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 
 @Entity
-public class Project {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,16 +22,13 @@ public class Project {
 
     private String description;
 
-    @OneToMany(mappedBy = "project", orphanRemoval = true, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Task> tasks = new HashSet<>();
-
-    public Project(String code, String name, String description) {
+    public Product(String code, String name, String description) {
         this.code = code;
         this.name = name;
         this.description = description;
     }
 
-    public Project() {
+    public Product() {
     }
 
     public Long getId() {
@@ -71,14 +63,6 @@ public class Project {
         this.description = description;
     }
 
-    public Set<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(Set<Task> tasks) {
-        this.tasks = tasks;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hashCode(code);
@@ -92,7 +76,7 @@ public class Project {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Project other = (Project) obj;
+        Product other = (Product) obj;
         if (code == null) {
             if (other.code != null)
                 return false;
