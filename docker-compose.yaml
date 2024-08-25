@@ -7,23 +7,62 @@ services:
     ports:
       - "5432:5432"
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       POSTGRES_USER: user
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: jdbc_schema
     volumes:
       - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d jdbc_schema" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin_container_prog
-    restart: always
+  chart:
+    build: chart-service
+    mem_limit: 512m
     ports:
-      - "8888:80"
+      - "9000:9000"
     environment:
-      PGADMIN_DEFAULT_EMAIL: user@domain.com
-      PGADMIN_DEFAULT_PASSWORD: password
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
+      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
+      - CONFIG_SERVER_HOST=${CONFIG_SERVER_HOST}
+      - CONFIG_SERVER_PORT=${CONFIG_SERVER_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  purchase:
+    build: purchase-service
+    mem_limit: 512m
+    ports:
+      - "9001:9001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
+      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
+      - CONFIG_SERVER_HOST=${CONFIG_SERVER_HOST}
+      - CONFIG_SERVER_PORT=${CONFIG_SERVER_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  warehouse:
+    build: warehouse-service
+    mem_limit: 512m
+    ports:
+      - "9002:9002"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
+      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
+      - CONFIG_SERVER_HOST=${CONFIG_SERVER_HOST}
+      - CONFIG_SERVER_PORT=${CONFIG_SERVER_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   pg-data:
