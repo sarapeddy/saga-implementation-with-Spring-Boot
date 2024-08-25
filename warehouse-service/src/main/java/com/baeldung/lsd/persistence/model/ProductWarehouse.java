@@ -1,20 +1,15 @@
 package com.baeldung.lsd.persistence.model;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 
 @Entity
-public class Product {
+public class ProductWarehouse {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,13 +22,13 @@ public class Product {
 
     private String description;
 
-    public Product(String code, String name, String description) {
+    public ProductWarehouse(String code, String name, String description) {
         this.code = code;
         this.name = name;
         this.description = description;
     }
 
-    public Product() {
+    public ProductWarehouse() {
     }
 
     public Long getId() {
@@ -81,7 +76,7 @@ public class Product {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Product other = (Product) obj;
+        ProductWarehouse other = (ProductWarehouse) obj;
         if (code == null) {
             if (other.code != null)
                 return false;
