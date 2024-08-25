@@ -2,11 +2,7 @@ package com.baeldung.lsd.persistence.model;
 
 import java.util.Objects;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class ProductPurchase {
@@ -21,6 +17,7 @@ public class ProductPurchase {
     private String name;
 
     private String description;
+
 
     public ProductPurchase(String code, String name, String description) {
         this.code = code;

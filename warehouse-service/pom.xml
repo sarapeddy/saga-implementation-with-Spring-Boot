@@ -1,11 +1,11 @@
-<product xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <description>Warehouse Service for Saga Implementation</description>
+    <description>Learn Spring Data - Spring Data JPA Setup - End</description>
 
     <groupId>com.baeldung.learn-spring-data</groupId>
-    <artifactId>warehouse-service</artifactId>
+    <artifactId>spring-data-jpa-setup-end</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -70,7 +70,7 @@
 
     <properties>
         <!-- non-dependencies -->
-        <product.build.sourceEncoding>UTF-8</product.build.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>21</java.version>
 
     </properties>
@@ -82,4 +82,4 @@
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
-</product>
+</project>

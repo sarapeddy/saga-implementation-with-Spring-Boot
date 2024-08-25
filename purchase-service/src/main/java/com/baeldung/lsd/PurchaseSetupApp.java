@@ -8,12 +8,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PurchaseServiceApp implements ApplicationRunner {
+public class PurchaseSetupApp implements ApplicationRunner {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PurchaseServiceApp.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PurchaseSetupApp.class);
 
     public static void main(final String... args) {
-        SpringApplication.run(PurchaseServiceApp.class, args);
+        SpringApplication.run(PurchaseSetupApp.class, args);
     }
 
     @Override
