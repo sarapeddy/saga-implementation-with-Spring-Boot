@@ -9,7 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Product {
+public class ProductChart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,13 +23,13 @@ public class Product {
     private String description;
 
 
-    public Product(String code, String name, String description) {
+    public ProductChart(String code, String name, String description) {
         this.code = code;
         this.name = name;
         this.description = description;
     }
 
-    public Product() {
+    public ProductChart() {
     }
 
     public Long getId() {
@@ -77,7 +77,7 @@ public class Product {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Product other = (Product) obj;
+        ProductChart other = (ProductChart) obj;
         if (code == null) {
             if (other.code != null)
                 return false;
