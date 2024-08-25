@@ -1,8 +1,8 @@
-version: "3.8"
+#version: "3.8"
 services:
-  postgres-chart:
+  postgres:
     image: postgres:16
-    container_name: postgres_chart_container
+    container_name: postgres_container_prog
     restart: always
     ports:
       - "5432:5432"
@@ -13,32 +13,17 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data
 
-  postgres-purchase:
-    image: postgres:16
-    container_name: postgres_purchase_container
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_container_prog
     restart: always
     ports:
-      - "5433:5432"
+      - "8888:80"
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: jdbc_schema
+      PGADMIN_DEFAULT_EMAIL: user@domain.com
+      PGADMIN_DEFAULT_PASSWORD: password
     volumes:
-      - pg-data:/var/lib/postgresql/data
-
-  postgres-warehouse:
-    image: postgres:16
-    container_name: postgres_warehouse_container
-    restart: always
-    ports:
-      - "5434:5432"
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: jdbc_schema
-    volumes:
-      - pg-data:/var/lib/postgresql/data
-
+      - pgadmin-data:/var/lib/pgadmin
 
 volumes:
   pg-data:
