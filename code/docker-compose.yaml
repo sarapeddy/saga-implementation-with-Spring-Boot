@@ -64,6 +64,23 @@ services:
       postgres:
         condition: service_healthy
 
+  orchestrator:
+    build: chart-service
+    mem_limit: 512m
+    ports:
+      - "9003:9003"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
+      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
+      - CONFIG_SERVER_HOST=${CONFIG_SERVER_HOST}
+      - CONFIG_SERVER_PORT=${CONFIG_SERVER_PORT}
+    depends_on:
+      - postgres
+      - chart
+      - purchase
+      - warehouse
+
 volumes:
   pg-data:
   pgadmin-data:
