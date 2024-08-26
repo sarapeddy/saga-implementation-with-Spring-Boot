@@ -65,7 +65,7 @@ services:
         condition: service_healthy
 
   orchestrator:
-    build: chart-service
+    build: orchestrator-service
     mem_limit: 512m
     ports:
       - "9003:9003"
