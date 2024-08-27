@@ -33,7 +33,7 @@ public class ChartSetupApp implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         TaskClient taskClient = new TaskClient();
-        taskClient.setRootURI("http://localhost:8080/api/"); // Point this to the server API
+        taskClient.setRootURI("http://conductor:8080/api/"); // Point this to the server API
 
         int threadCount = 1; // number of threads used to execute workers.  To avoid starvation, should be
 
