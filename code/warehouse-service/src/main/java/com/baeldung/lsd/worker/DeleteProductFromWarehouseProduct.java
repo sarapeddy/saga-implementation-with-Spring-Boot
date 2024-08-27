@@ -1,24 +1,23 @@
 package com.baeldung.lsd.worker;
 
-import com.baeldung.lsd.persistence.model.ProductPurchase;
-import com.baeldung.lsd.persistence.repository.ProductPurchaseRepository;
+import com.baeldung.lsd.persistence.model.ProductWarehouse;
+import com.baeldung.lsd.persistence.repository.ProductWarehouseRepository;
 import com.netflix.conductor.client.worker.Worker;
 import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import org.springframework.beans.factory.annotation.Value;
 
-
 import java.util.Optional;
 
-public class InsertProductPurchaseWorker implements Worker {
+public class DeleteProductFromWarehouseProduct implements Worker {
 
     private final String taskDefName;
-    private final ProductPurchaseRepository productPurchaseRepository;
+    private final ProductWarehouseRepository productWarehouseRepository;
 
-    public InsertProductPurchaseWorker(@Value("taskDefName") String taskDefName, ProductPurchaseRepository productPurchaseRepository) {
+    public DeleteProductFromWarehouseProduct(@Value("taskDefName") String taskDefName,  ProductWarehouseRepository productWarehouseRepository) {
         System.out.println("TaskDefName: " + taskDefName);
         this.taskDefName = taskDefName;
-        this.productPurchaseRepository = productPurchaseRepository;
+        this.productWarehouseRepository = productWarehouseRepository;
     }
 
     @Override
@@ -29,16 +28,26 @@ public class InsertProductPurchaseWorker implements Worker {
     @Override
     public TaskResult execute(Task task) {
         TaskResult result = new TaskResult(task);
-        String id = (String) task.getInputData().get("id");
+        String code = (String) task.getInputData().get("productCode");
 
-        Optional<ProductPurchase> productPurchase = productPurchaseRepository.findById(Long.parseLong(id));
+        Optional<ProductWarehouse> productWarehouse = productWarehouseRepository.findByCode(code);
 
-        result.addOutputData("info", productPurchase);
+        if(productWarehouse.isPresent()) {
+            ProductWarehouse product = productWarehouse.get();
 
-        System.out.println("Info: " + productPurchase);
-        System.out.println("Insert product purchase");
+            result.addOutputData("name", product.getName());
+            result.addOutputData("description", product.getDescription());
 
-        result.setStatus(TaskResult.Status.COMPLETED);
+            productWarehouseRepository.delete(product);
+
+            System.out.println("Delete product from warehouse");
+
+            result.setStatus(TaskResult.Status.COMPLETED);
+        }
+        else {
+            result.setStatus(TaskResult.Status.FAILED);
+        }
+
         return result;
     }
 
