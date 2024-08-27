@@ -7,18 +7,15 @@ import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import org.springframework.beans.factory.annotation.Value;
 
-
-import java.util.Optional;
-
-public class InsertProductPurchaseWorker implements Worker {
+public class PurchaseInsertWorker implements Worker {
 
     private final String taskDefName;
-    private final ProductPurchaseRepository productPurchaseRepository;
+    private final ProductPurchaseRepository productChartRepository;
 
-    public InsertProductPurchaseWorker(@Value("taskDefName") String taskDefName, ProductPurchaseRepository productPurchaseRepository) {
+    public PurchaseInsertWorker(@Value("taskDefName") String taskDefName, ProductPurchaseRepository productChartRepository) {
         System.out.println("TaskDefName: " + taskDefName);
         this.taskDefName = taskDefName;
-        this.productPurchaseRepository = productPurchaseRepository;
+        this.productChartRepository = productChartRepository;
     }
 
     @Override
@@ -29,14 +26,19 @@ public class InsertProductPurchaseWorker implements Worker {
     @Override
     public TaskResult execute(Task task) {
         TaskResult result = new TaskResult(task);
-        String id = (String) task.getInputData().get("id");
+        String code = (String) task.getInputData().get("productCode");
+        String name = (String) task.getInputData().get("name");
+        String description = (String) task.getInputData().get("description");
 
-        Optional<ProductPurchase> productPurchase = productPurchaseRepository.findById(Long.parseLong(id));
+        System.out.println("Code: " + code);
+        System.out.println("Name: " + name);
+        System.out.println("Description: " + description);
 
-        result.addOutputData("info", productPurchase);
+        ProductPurchase product = new ProductPurchase(code, name, description);
 
-        System.out.println("Info: " + productPurchase);
-        System.out.println("Insert product purchase");
+        productChartRepository.save(product);
+
+        System.out.println("Add product to chart db");
 
         result.setStatus(TaskResult.Status.COMPLETED);
         return result;
