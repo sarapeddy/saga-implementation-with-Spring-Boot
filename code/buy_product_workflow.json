@@ -1,13 +1,13 @@
 {
   "ownerApp": null,
   "createTime": null,
-  "updateTime": 1724790079858,
+  "updateTime": 1724790818539,
   "createdBy": null,
   "updatedBy": null,
   "accessPolicy": {},
   "name": "product_sale_workflow",
   "description": "Product Sale",
-  "version": 8,
+  "version": 9,
   "tasks": [
     {
       "name": "delete_warehouse_product",
@@ -32,7 +32,7 @@
       "rateLimited": null,
       "asyncComplete": false,
       "loopCondition": null,
-      "retryCount": null,
+      "retryCount": 0,
       "evaluatorType": null,
       "expression": null
     },
@@ -61,7 +61,7 @@
       "rateLimited": null,
       "asyncComplete": false,
       "loopCondition": null,
-      "retryCount": null,
+      "retryCount": 0,
       "evaluatorType": null,
       "expression": null
     },
@@ -88,7 +88,7 @@
       "rateLimited": null,
       "asyncComplete": false,
       "loopCondition": null,
-      "retryCount": null,
+      "retryCount": 0,
       "evaluatorType": null,
       "expression": null
     },
@@ -129,7 +129,7 @@
             "rateLimited": null,
             "asyncComplete": false,
             "loopCondition": null,
-            "retryCount": null,
+            "retryCount": 0,
             "evaluatorType": null,
             "expression": null
           },
@@ -158,7 +158,7 @@
             "rateLimited": null,
             "asyncComplete": false,
             "loopCondition": null,
-            "retryCount": null,
+            "retryCount": 0,
             "evaluatorType": null,
             "expression": null
           }
@@ -175,7 +175,7 @@
       "rateLimited": null,
       "asyncComplete": false,
       "loopCondition": null,
-      "retryCount": null,
+      "retryCount": 0,
       "evaluatorType": "value-param",
       "expression": "switchCaseValue"
     }
