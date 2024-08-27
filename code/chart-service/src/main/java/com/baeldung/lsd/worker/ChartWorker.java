@@ -1,26 +1,24 @@
 package com.baeldung.lsd.worker;
 
+import com.baeldung.lsd.persistence.model.ProductChart;
 import com.baeldung.lsd.persistence.repository.ProductChartRepository;
 import com.netflix.conductor.client.worker.Worker;
 import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
-import org.hibernate.annotations.Comment;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-@Component
+
+import java.util.Optional;
+
 public class ChartWorker implements Worker {
 
     private final String taskDefName;
+    private final ProductChartRepository productChartRepository;
 
-    @Autowired
-    private ProductChartRepository productChartRepository;
-
-    public ChartWorker(@Value("taskDefName") String taskDefName) {
+    public ChartWorker(@Value("taskDefName") String taskDefName, ProductChartRepository productChartRepository) {
+        System.out.println("TaskDefName: " + taskDefName);
         this.taskDefName = taskDefName;
+        this.productChartRepository = productChartRepository;
     }
 
     @Override
@@ -33,8 +31,11 @@ public class ChartWorker implements Worker {
         TaskResult result = new TaskResult(task);
         String id = (String) task.getInputData().get("id");
 
-        result.addOutputData("info", productChartRepository.findById(Long.parseLong(id)));
+        Optional<ProductChart> productChart = productChartRepository.findById(Long.parseLong(id));
 
+        result.addOutputData("info", productChart);
+
+        System.out.println("Info: " + productChart);
         System.out.println("Chiamata chart service");
 
         result.setStatus(TaskResult.Status.COMPLETED);

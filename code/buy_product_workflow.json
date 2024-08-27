@@ -1,6 +1,6 @@
 {
   "name": "example_workflow",
-  "description": "Simple Workflow",
+  "description": "An example workflow",
   "version": 1,
   "tasks": [
     {
