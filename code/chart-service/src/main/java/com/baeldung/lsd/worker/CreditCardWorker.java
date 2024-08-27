@@ -10,15 +10,13 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Optional;
 
-public class ChartWorker implements Worker {
+public class CreditCardWorker implements Worker {
 
     private final String taskDefName;
-    private final ProductChartRepository productChartRepository;
 
-    public ChartWorker(@Value("taskDefName") String taskDefName, ProductChartRepository productChartRepository) {
+    public CreditCardWorker(@Value("taskDefName") String taskDefName) {
         System.out.println("TaskDefName: " + taskDefName);
         this.taskDefName = taskDefName;
-        this.productChartRepository = productChartRepository;
     }
 
     @Override
@@ -29,16 +27,18 @@ public class ChartWorker implements Worker {
     @Override
     public TaskResult execute(Task task) {
         TaskResult result = new TaskResult(task);
-        String id = (String) task.getInputData().get("id");
+        String creditCard = (String) task.getInputData().get("creditCard");
 
-        Optional<ProductChart> productChart = productChartRepository.findById(Long.parseLong(id));
+        System.out.println("Credit card: " + creditCard);
 
-        result.addOutputData("info", productChart);
-
-        System.out.println("Info: " + productChart);
-        System.out.println("Chiamata chart service");
+        if (creditCard != null && creditCard.matches("^\\d{16}$")) {
+            result.addOutputData("status", "valid");
+        } else {
+            result.addOutputData("status", "Invalid credit card");
+        }
 
         result.setStatus(TaskResult.Status.COMPLETED);
+        System.out.println("Controllo numero di carta di credito");
         return result;
     }
 

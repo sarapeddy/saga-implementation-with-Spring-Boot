@@ -1,8 +1,8 @@
 {
   "createdBy": "",
   "updatedBy": "",
-  "name": "get_chart_info",
-  "description": "Get info about a chart",
+  "name": "insert_product_in_the_chart",
+  "description": "Insert product in the chart",
   "retryCount": 3,
   "timeoutSeconds": 1200,
   "inputKeys": [

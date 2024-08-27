@@ -10,12 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Optional;
 
-public class ChartDeletionWorker implements Worker {
+public class ChartInsertWorker implements Worker {
 
     private final String taskDefName;
     private final ProductChartRepository productChartRepository;
 
-    public ChartDeletionWorker(@Value("taskDefName") String taskDefName, ProductChartRepository productChartRepository) {
+    public ChartInsertWorker(@Value("taskDefName") String taskDefName, ProductChartRepository productChartRepository) {
         System.out.println("TaskDefName: " + taskDefName);
         this.taskDefName = taskDefName;
         this.productChartRepository = productChartRepository;
@@ -29,14 +29,19 @@ public class ChartDeletionWorker implements Worker {
     @Override
     public TaskResult execute(Task task) {
         TaskResult result = new TaskResult(task);
-        String id = (String) task.getInputData().get("id");
+        String code = (String) task.getInputData().get("productCode");
+        String name = (String) task.getInputData().get("name");
+        String description = (String) task.getInputData().get("description");
 
-        Optional<ProductChart> productChart = productChartRepository.findById(Long.parseLong(id));
+        System.out.println("Code: " + code);
+        System.out.println("Name: " + name);
+        System.out.println("Description: " + description);
 
-        result.addOutputData("info", productChart);
+        ProductChart product = new ProductChart(code, name, description);
 
-        System.out.println("Info: " + productChart);
-        System.out.println("Chiamata chart service");
+        productChartRepository.save(product);
+
+        System.out.println("Add product to chart db");
 
         result.setStatus(TaskResult.Status.COMPLETED);
         return result;
