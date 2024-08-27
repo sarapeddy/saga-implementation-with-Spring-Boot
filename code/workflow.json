@@ -1,0 +1,27 @@
+{
+  "name": "example_workflow",
+  "description": "Simple Workflow",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "get_chart_info",
+      "taskReferenceName": "get_chart_info_ref_1",
+      "inputParameters": {
+        "id": "${workflow.input.id}"
+      },
+      "type": "SIMPLE"
+    }
+  ],
+  "inputParameters": [],
+  "outputParameters": {
+    "wfop": "${get_chart_info_ref_1.input.id}"
+  },
+  "schemaVersion": 2,
+  "restartable": true,
+  "workflowStatusListenerEnabled": false,
+  "ownerEmail": "testemail@gmail.com",
+  "timeoutPolicy": "ALERT_ONLY",
+  "timeoutSeconds": 0,
+  "variables": {},
+  "inputTemplate": {}
+}

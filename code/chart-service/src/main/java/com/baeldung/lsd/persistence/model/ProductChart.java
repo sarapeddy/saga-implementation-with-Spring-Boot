@@ -2,7 +2,7 @@ package com.baeldung.lsd.persistence.model;
 
 import java.util.Objects;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @Entity
 public class ProductChart {

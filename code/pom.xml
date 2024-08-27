@@ -13,7 +13,6 @@
 		<module>chart-service</module>
 		<module>purchase-service</module>
 		<module>warehouse-service</module>
-		<module>orchestrator-service</module>
 	</modules>
 
 </project>
