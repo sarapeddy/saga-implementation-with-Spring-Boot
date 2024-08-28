@@ -8,6 +8,34 @@ In a microservices architecture, traditional ACID (Atomicity, Consistency, Isola
 isolation. This topic and how to address its will be discussed in more detail later in the notebook.
 
 
+## Anomalies that the lack of isolation can cause
+
+The lack of isolation, as mentioned at the beginning, can cause the three following problems:
+
+- **Lost Updates**: This anomaly occurs when one saga overwrites the changes made by another saga without first reading them. As a result, critical updates can be lost, leading to inconsistent or incorrect data in the system.
+
+- **Dirty Reads**: This happens when a saga reads data that is currently being updated by another saga that hasn't yet completed its transaction. This can lead to decisions based on incomplete or incorrect data, potentially causing significant issues like exceeding credit limits or making unauthorized changes.
+
+- **Fuzzy/nonrepeatable reads**: Two different steps of a saga read the same data and
+get different results because another saga has made updates
+
+## How to solve the lack of isolation problem
+
+The saga transaction model adheres to ACD (Atomicity, Consistency, Durability) principles but lacks isolation, leading to potential anomalies that can cause issues in applications. Developers must implement strategies to either prevent these anomalies or reduce their impact on the business.  The key countermeasures usually used are:
+
+- **Semantic lock**: involves setting a flag on a record during a compensatable transaction to indicate that the record is not yet finalized and could change. This flag can act as a lock, preventing other transactions from accessing the record, or as a warning, advising other transactions to proceed with caution. The flag is cleared when the saga completes successfully (via a retriable transaction) or when it rolls back (via a compensating transaction).
+
+- **Commutative updates**: Design updates to be executable in any order. They must be commutative.
+
+- **Pessimistic view**: Reorder saga steps to minimize business risk. It addresses the lack of isolation by reordering the steps of a saga to reduce business risks associated with dirty reads. By strategically adjusting the sequence of transactions, this approach ensures that more critical operations occur in a way that minimizes the potential impact of inconsistent data, thereby reducing the likelihood of errors caused by concurrent transactions.
+
+- **Reread value**: Prevent dirty writes by verifying data before overwriting it. If the record has been modified, the saga aborts and may restart. This approach is a form of the Optimistic Offline Lock pattern. By checking for changes before committing an update, this countermeasure ensures that the saga operates on consistent data, reducing the risk of conflicts or overwriting updates made by other processes.
+
+- **Version file**: Record updates to allow reordering. Th
+is countermeasure addresses the issue of out-of-order operations by recording each operation performed on a record. This log allows the system to reorder operations to ensure they are applied in the correct sequence. By maintaining a record of operations, the system can handle concurrent requests more effectively. This approach effectively transforms noncommutative operations into commutative ones, ensuring consistency even when transactions are processed out of order.
+
+- **By value**: Use the business risk of each request to dynamically select a concurrency mechanism. It involves selecting concurrency mechanisms based on the business risk associated with each request. For low-risk requests, such as those involving minor operations, sagas with appropriate countermeasures can be used. For high-risk requests, like those involving substantial financial transactions, distributed transactions are employed to ensure higher levels of consistency and reliability. This approach allows applications to balance business risk, availability, and scalability dynamically.
+
 
 ## Why cannot we use a distributed transaction?
 
@@ -70,22 +98,7 @@ On the other hands, Orchestration has more advantages that makes this solution m
 - **Visibility and Monitoring**: Centralized visibility enables quicker issue detection and resolution, improving system reliability.
 - **Faster Time to Market**: Simplifies service integration and flow creation, speeding up adaptation and reducing the time to market.
 
-## How to solve the problem of the lack of isolation
 
-The saga transaction model adheres to ACD (Atomicity, Consistency, Durability) principles but lacks isolation, leading to potential anomalies that can cause issues in applications. Developers must implement strategies to either prevent these anomalies or reduce their impact on the business.  The key countermeasures usually used are:
-
-- **Semantic lock**: involves setting a flag on a record during a compensatable transaction to indicate that the record is not yet finalized and could change. This flag can act as a lock, preventing other transactions from accessing the record, or as a warning, advising other transactions to proceed with caution. The flag is cleared when the saga completes successfully (via a retriable transaction) or when it rolls back (via a compensating transaction).
-
-- **Commutative updates**: Design updates to be executable in any order. They must be commutative.
-
-- **Pessimistic view**: Reorder saga steps to minimize business risk. It addresses the lack of isolation by reordering the steps of a saga to reduce business risks associated with dirty reads. By strategically adjusting the sequence of transactions, this approach ensures that more critical operations occur in a way that minimizes the potential impact of inconsistent data, thereby reducing the likelihood of errors caused by concurrent transactions.
-
-- **Reread value**: Prevent dirty writes by verifying data before overwriting it. If the record has been modified, the saga aborts and may restart. This approach is a form of the Optimistic Offline Lock pattern. By checking for changes before committing an update, this countermeasure ensures that the saga operates on consistent data, reducing the risk of conflicts or overwriting updates made by other processes.
-
-- **Version file**: Record updates to allow reordering. Th
-is countermeasure addresses the issue of out-of-order operations by recording each operation performed on a record. This log allows the system to reorder operations to ensure they are applied in the correct sequence. By maintaining a record of operations, the system can handle concurrent requests more effectively. This approach effectively transforms noncommutative operations into commutative ones, ensuring consistency even when transactions are processed out of order.
-
-- **By value**: Use the business risk of each request to dynamically select a concurrency mechanism. It involves selecting concurrency mechanisms based on the business risk associated with each request. For low-risk requests, such as those involving minor operations, sagas with appropriate countermeasures can be used. For high-risk requests, like those involving substantial financial transactions, distributed transactions are employed to ensure higher levels of consistency and reliability. This approach allows applications to balance business risk, availability, and scalability dynamically.
 
 
 
