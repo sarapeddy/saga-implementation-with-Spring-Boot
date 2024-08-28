@@ -37,8 +37,8 @@
       "expression": null
     },
     {
-      "name": "insert_product_in_the_chart",
-      "taskReferenceName": "insert_product_in_the_chart_task",
+      "name": "insert_product_in_the_cart",
+      "taskReferenceName": "insert_product_in_the_cart_task",
       "description": null,
       "inputParameters": {
         "productCode": "${workflow.input.productCode}",
@@ -107,8 +107,8 @@
       "decisionCases": {
         "valid": [
           {
-            "name": "chart_delete_product",
-            "taskReferenceName": "chart_delete_product_ref",
+            "name": "cart_delete_product",
+            "taskReferenceName": "cart_delete_product_ref",
             "description": null,
             "inputParameters": {
               "productCode": "${workflow.input.productCode}"
