@@ -7,12 +7,12 @@ import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import org.springframework.beans.factory.annotation.Value;
 
-public class ChartInsertWorker implements Worker {
+public class CartInsertWorker implements Worker {
 
     private final String taskDefName;
     private final ProductCartRepository productChartRepository;
 
-    public ChartInsertWorker(@Value("taskDefName") String taskDefName, ProductCartRepository productChartRepository) {
+    public CartInsertWorker(@Value("taskDefName") String taskDefName, ProductCartRepository productChartRepository) {
         System.out.println("TaskDefName: " + taskDefName);
         this.taskDefName = taskDefName;
         this.productChartRepository = productChartRepository;

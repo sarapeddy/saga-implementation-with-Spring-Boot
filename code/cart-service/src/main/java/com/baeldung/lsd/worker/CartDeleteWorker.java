@@ -9,12 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Optional;
 
-public class ChartDeleteWorker implements Worker {
+public class CartDeleteWorker implements Worker {
 
     private final String taskDefName;
     private final ProductCartRepository productChartRepository;
 
-    public ChartDeleteWorker(@Value("taskDefName") String taskDefName,  ProductCartRepository productWarehouseRepository) {
+    public CartDeleteWorker(@Value("taskDefName") String taskDefName, ProductCartRepository productWarehouseRepository) {
         System.out.println("TaskDefName: " + taskDefName);
         this.taskDefName = taskDefName;
         this.productChartRepository = productWarehouseRepository;

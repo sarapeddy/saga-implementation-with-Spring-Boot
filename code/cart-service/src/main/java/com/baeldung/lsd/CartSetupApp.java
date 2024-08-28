@@ -1,8 +1,8 @@
 package com.baeldung.lsd;
 
 import com.baeldung.lsd.persistence.repository.ProductCartRepository;
-import com.baeldung.lsd.worker.ChartDeleteWorker;
-import com.baeldung.lsd.worker.ChartInsertWorker;
+import com.baeldung.lsd.worker.CartDeleteWorker;
+import com.baeldung.lsd.worker.CartInsertWorker;
 import com.baeldung.lsd.worker.CreditCardWorker;
 import com.netflix.conductor.client.automator.TaskRunnerConfigurer;
 import com.netflix.conductor.client.http.TaskClient;
@@ -39,9 +39,9 @@ public class CartSetupApp implements ApplicationRunner {
         int threadCount = 1; // number of threads used to execute workers.  To avoid starvation, should be
 
 
-        Worker worker1 = new ChartInsertWorker("insert_product_in_the_cart", productCartRepository);
+        Worker worker1 = new CartInsertWorker("insert_product_in_the_cart", productCartRepository);
         Worker worker2 = new CreditCardWorker("check_credit_card");
-        Worker worker3 = new ChartDeleteWorker("cart_delete_product", productCartRepository);
+        Worker worker3 = new CartDeleteWorker("cart_delete_product", productCartRepository);
 
         Collection workerArrayList = new ArrayList<Worker>();
         workerArrayList.add(worker1);
