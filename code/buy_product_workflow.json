@@ -184,7 +184,9 @@
     "productCode",
     "creditCard"
   ],
-  "outputParameters": {},
+  "outputParameters": {
+    "result": "${check_credit_card_ref.output.status}"
+  },
   "failureWorkflow": "",
   "schemaVersion": 2,
   "restartable": false,
