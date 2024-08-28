@@ -31,8 +31,8 @@ services:
       - postgres:/pgdata
     restart: always
 
-  chart:
-    build: chart-service
+  cart:
+    build: cart-service
     mem_limit: 512m
     ports:
       - "9000:9000"
