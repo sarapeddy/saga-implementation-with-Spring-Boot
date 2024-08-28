@@ -39,9 +39,9 @@ public class CartSetupApp implements ApplicationRunner {
         int threadCount = 1; // number of threads used to execute workers.  To avoid starvation, should be
 
 
-        Worker worker1 = new ChartInsertWorker("insert_product_in_the_chart", productCartRepository);
+        Worker worker1 = new ChartInsertWorker("insert_product_in_the_cart", productCartRepository);
         Worker worker2 = new CreditCardWorker("check_credit_card");
-        Worker worker3 = new ChartDeleteWorker("chart_delete_product", productCartRepository);
+        Worker worker3 = new ChartDeleteWorker("cart_delete_product", productCartRepository);
 
         Collection workerArrayList = new ArrayList<Worker>();
         workerArrayList.add(worker1);
