@@ -262,6 +262,13 @@ To run the workflow, there is a section called ***Workbech***.
 
 Here, you can select which workflow execute and the set the input parameter. Once the configuration is ready click *Play*.
 
+## How can to see the execution results
+
+In Conductor UI there is also another section called ***Executions**. Inside it is possible to see the results of every workflow executed and analyze the input/output parameters. It is very useful for debugging stuff. 
+<div style="text-align: center">
+    <img src="/slides/images/executions.png" alt="executions tab">
+</div>
+
 ## Run Services without Docker
 
 In this case, Conductor runs on Docker, but the services run locally. There is only one thing to remember: we have to change the Conductor url. So, the only line of code to change is the following one:
@@ -273,7 +280,7 @@ and must be rewrite with:
 ```java
 taskClient.setRootURI("http://localhost:8080/api/");
 ```
-The rest of execution remain unchanged.
+The rest of execution remains unchanged.
 
 ## References
 
