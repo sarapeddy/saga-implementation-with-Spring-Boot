@@ -13,7 +13,7 @@ A typical example of a microservices architecture is e-commerce platforms where 
 
 - `purchase-service`, which handle the purchased products.
 
-As orchestrator, we will use **Orkes Conductor** because it is easily deployable via a Docker container and has an intuitive graphical interface. This interface allows us to define workflows, manage invocations, and configure the tasks. We will explore these aspects in more detail as we proceed.
+As orchestrator, we will use **Conductor** because it is easily deployable via a Docker container and has an intuitive graphical interface. This interface allows us to define workflows, manage invocations, and configure the tasks. We will explore these aspects in more detail as we proceed.
 
 
 ## The workflow to implement
@@ -25,7 +25,7 @@ To ensure that the orchestrator can manage transactions across each microservice
     <img src="/slides/images/workflow.png" alt="workflow " width="300" height="300">
 </div>
 
-We previously mentioned that our project aims to simulate an e-commerce platform, so every product (before the sale) must do some checks. For instance it is important to verify if a number of credit card is valid. The workflow shown at the beginning represents the steps a product must go through before being sold. Essentially, a workflow in Orkes is an implementation of an activity diagram, consisting of a series of tasks to be executed in sequence. Specifically, our workflow want to represent the product sale process. It includes:
+We previously mentioned that our project aims to simulate an e-commerce platform, so every product (before the sale) must do some checks. For instance it is important to verify if a number of credit card is valid. The workflow shown at the beginning represents the steps a product must go through before being sold. Essentially, a workflow in Conductor environment is an implementation of an activity diagram, consisting of a series of tasks to be executed in sequence. Specifically, our workflow want to represent the product sale process. It includes:
 
 1. Removing the product from the warehouse.
 
@@ -47,7 +47,7 @@ Before diving into the implementation details, it's helpful to review the Docker
 
 - **postgres**: This container manages the databases for the microservices. Although each of them should ideally have its own separate database, we simulate this by creating separate tables within a single Postgres container to simplify setup and reduce resource usage.
 
-- **conductor**: This container runs the Orkes Conductor image, which is used for the orchestration task and to run the workflows. It is important to remember that it is the only container which expose 2 ports: `5000` to access at the UI and `8080` to allow the services to register their tasks. 
+- **conductor**: This container runs the Conductor image, which is used for the orchestration task and to run the workflows. It is important to remember that it is the only container which expose 2 ports: `5000` to access at the UI and `8080` to allow the services to register their tasks. 
 
 - **cart**: This container hosts the `cart-service`.
 
@@ -57,7 +57,7 @@ Before diving into the implementation details, it's helpful to review the Docker
 
 ## Workflow definition with Conductor
 
-Once the theoretical aspects of the workflow are defined, including its tasks, input and output parameters, and so on, it's time to move on to the implementation using Orkes Conductor. Orkes Conductor uses a JSON file to define a workflow. It becomes a one-to-one translation of what was previously done with some more information treated as metadata. These ones are very important because they specify task lifecycle, how many times a task must be retry in case of fall and so on. The structure of the JSON file becomes as follows:
+Once the theoretical aspects of the workflow are defined, including its tasks, input and output parameters, and so on, it's time to move on to the implementation using Conductor. Conductor uses a JSON file to define a workflow. It becomes a one-to-one translation of what was previously done with some more information treated as metadata. These ones are very important because they specify task lifecycle, how many times a task must be retry in case of fall and so on. The basic structure of the JSON file becomes as follows:
 
 ```json
 {
@@ -90,27 +90,93 @@ Once the theoretical aspects of the workflow are defined, including its tasks, i
     ....
   ]
 }
-
-
 ```
 
+Of course, there may be cases, as in our example, where more complex constructs are needed, involving the use of specific operators such as SWITCH, DO-WHILE, and others. For the specific syntax, you can refer to the [reference](https://conductor-oss.github.io/conductor/documentation/configuration/workflowdef/operators/index.html).
 
-It outlines the sequence of tasks and their configuration. The best approach you can follow to develop it is reported as follows:
-
-- **Define the Workflow Structure**: In the JSON file, specify the overall structure of the workflow, including its name and any metadata. This serves as a blueprint for the tasks to be executed.
-
-- **Specify Tasks**: Each task within the workflow is defined with its own JSON object. Tasks include information such as the task type, the service it interacts with, and any input parameters it requires.
-
-- **Configure Task Parameters**: For each task, define the input parameters that it requires and the output it produces. This ensures that data flows correctly between tasks and that each task has the necessary information to execute properly.
-
-- **Handle Task Transitions**: Define how tasks transition from one to another. This includes specifying conditions under which tasks should be executed, how to handle retries, and what actions to take in case of failures.
-
-- **Error Handling and Compensation**: Implement error handling and compensation logic to manage any issues that arise during task execution. This might involve specifying compensating transactions or fallback actions to ensure the workflow completes successfully or is properly rolled back.
-
+The complete implementation of our workflow is provided in the file `buy_product_workflow.json`.
 
 
 ## Task definition with Conductor
 
+When defining tasks, there are two main steps to follow:
+
+1. Define the task characteristics using a JSON file.
+
+2. Implement the tasks in Java within the various microservices by implementing the [Worker](https://conductor-oss.github.io/conductor/devguide/how-tos/Workers/build-a-java-task-worker.html) interface from Conductor OSS.
+
+### 1. Task Definition with JSON File
+
+For each task, just like for each workflow, you need to define not only the name but also any associated **metadata**. These typically follow a standard configuration that doesn’t require many modification. Below it is reported an example that corresponds to the `check_credit_card` task in our workflow:
+
+```json
+{
+  "createdBy": "",
+  "updatedBy": "",
+  "name": "check_credit_card",
+  "description": "Check number of credit card",
+  "retryCount": 3,
+  "timeoutSeconds": 1200,
+  "inputKeys": [
+    "integer"
+  ],
+  "outputKeys": [
+    "sum"
+  ],
+  "timeoutPolicy": "TIME_OUT_WF",
+  "retryLogic": "FIXED",
+  "retryDelaySeconds": 60,
+  "responseTimeoutSeconds": 600,
+  "inputTemplate": {},
+  "rateLimitPerFrequency": 0,
+  "rateLimitFrequencyInSeconds": 1,
+  "ownerEmail": "yes.in.a.jiffy@gmail.com",
+  "backoffScaleFactor": 1
+}
+```
+
+Per quanto riguarda la definizione del tesk in Java basta implementare una classe seguendo questa struttura:
+
+```java
+package com.baeldung.lsd.worker;
+
+import com.netflix.conductor.client.worker.Worker;
+import com.netflix.conductor.common.metadata.tasks.Task;
+import com.netflix.conductor.common.metadata.tasks.TaskResult;
+import org.springframework.beans.factory.annotation.Value;
+
+public class CreditCardWorker implements Worker {
+
+    private final String taskDefName;
+
+    public CreditCardWorker(@Value("taskDefName") String taskDefName) {
+        System.out.println("TaskDefName: " + taskDefName);
+        this.taskDefName = taskDefName;
+    }
+
+    ...
+
+    @Override
+    public TaskResult execute(Task task) {
+        TaskResult result = new TaskResult(task);
+        String creditCard = (String) task.getInputData().get("creditCard");
+
+        System.out.println("Credit card: " + creditCard);
+
+        if (creditCard != null && creditCard.matches("^\\d{16}$")) {
+            result.addOutputData("status", "valid");
+        } else {
+            result.addOutputData("status", "Invalid credit card");
+        }
+
+        result.setStatus(TaskResult.Status.COMPLETED);
+        System.out.println("Controllo numero di carta di credito");
+        return result;
+    }
+
+}
+
+```
 
 ## How to execute the workflow
 
@@ -118,12 +184,14 @@ It outlines the sequence of tasks and their configuration. The best approach you
 
 ## References
 
-[Saga Pattern with Orkes](https://www.baeldung.com/orkes-conductor-saga-pattern-spring-boot)
+[Saga Pattern with Conductor - Baeldung](https://www.baeldung.com/orkes-conductor-saga-pattern-spring-boot)
 
-[Conductor Documentation](https://orkes.io/content/)
+[Conductor OSS site](https://conductor-oss.github.io/conductor/devguide/concepts/index.html)
 
-[Operators in Orkes Conductor](https://orkes.io/content/category/reference-docs/operators)
+[Conductor OSS Documentation]()
 
-[Basic Example of how to use Orkes Conductor](https://github.com/crisandolindesmanrumahorbo/conductor-netflix-demo)
+[Operators in Conductor](https://conductor-oss.github.io/conductor/documentation/configuration/workflowdef/operators/index.html)
+
+[Basic Example of how to use Conductor](https://github.com/crisandolindesmanrumahorbo/conductor-netflix-demo)
 
 [Java JPA Documentation](https://docs.spring.io/spring-data/jpa/reference/jpa.html)
