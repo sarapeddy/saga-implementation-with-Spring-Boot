@@ -15,6 +15,13 @@ A typical example of a microservices architecture is e-commerce platforms where 
 
 As orchestrator, we will use **Conductor** because it is easily deployable via a Docker container and has an intuitive graphical interface. This interface allows us to define workflows, manage invocations, and configure the tasks. We will explore these aspects in more detail as we proceed.
 
+In our implementation, the Product has four attributes:
+- *id*: the auto generated primary key;
+- *code*: an unique attribute used as an alternative key;
+- *name*: the product name;
+- *description*: the product description.
+
+The interaction with the database (*Postgres*) is handles by Java JPA to avoid the SQL writing.
 
 ## The workflow to implement
 
@@ -22,7 +29,7 @@ To ensure that the orchestrator can manage transactions across each microservice
 
 
 <div style="text-align: center">
-    <img src="/slides/images/workflow.png" alt="workflow " width="300" height="300">
+    <img src="/slides/images/workflow.png" alt="workflow " width="300" height="600">
 </div>
 
 We previously mentioned that our project aims to simulate an e-commerce platform, so every product (before the sale) must do some checks. For instance it is important to verify if a number of credit card is valid. The workflow shown at the beginning represents the steps a product must go through before being sold. Essentially, a workflow in Conductor environment is an implementation of an activity diagram, consisting of a series of tasks to be executed in sequence. Specifically, our workflow want to represent the product sale process. It includes:
@@ -135,7 +142,9 @@ For each task, just like for each workflow, you need to define not only the name
 }
 ```
 
-Per quanto riguarda la definizione del tesk in Java basta implementare una classe seguendo questa struttura:
+The JSON files for each task present in the considered microservice can be found in the `/resources/task` directory.
+
+When it comes to defining the task in Java, you simply need to implement a class following this structure:
 
 ```java
 package com.baeldung.lsd.worker;
@@ -150,7 +159,6 @@ public class CreditCardWorker implements Worker {
     private final String taskDefName;
 
     public CreditCardWorker(@Value("taskDefName") String taskDefName) {
-        System.out.println("TaskDefName: " + taskDefName);
         this.taskDefName = taskDefName;
     }
 
@@ -177,10 +185,95 @@ public class CreditCardWorker implements Worker {
 }
 
 ```
+Essentially, each Worker is associated with a Task, and the task's logic is implemented within the `execute()` method. The example provided is the implementation of the `check_credit_card` task from our workflow.
 
-## How to execute the workflow
+Typically, it is considered a best practice to place the implementation of Workers in a dedicated package named `worker`.
+
+It is also necessary to instantiate the Worker when the service starts. So, every *main* class must be as follows:
+
+```java
+
+@SpringBootApplication
+public class PurchaseSetupApp implements ApplicationRunner {
+
+    @Autowired
+    private ProductPurchaseRepository productPurchaseRepository;
+    ...
+
+    public static void main(final String... args) {
+        SpringApplication.run(PurchaseSetupApp.class, args);
+    }
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        TaskClient taskClient = new TaskClient();
+        taskClient.setRootURI("http://conductor:8080/api/"); // Point this to the server API
+
+        int threadCount = 1; // number of threads used to execute workers.  To avoid starvation, should be
+
+        Worker worker1 = new PurchaseInsertWorker("product_sale", productPurchaseRepository);
+
+        Collection workerArrayList = new ArrayList<Worker>();
+        workerArrayList.add(worker1);
+
+        TaskRunnerConfigurer configurer =
+                new TaskRunnerConfigurer.Builder(taskClient, workerArrayList)
+                        .withThreadCount(threadCount)
+                        .build();
+        // Start the polling and execution of tasks
+        configurer.init();
+
+        LOG.info("Starting Spring Boot application...");
+    }
+
+}
+
+```
 
 
+## How to execute the workflow with Docker
+
+Now that we have defined the workflow (both theoretically and practically), as well as the tasks and written the code to manage the JPA `@Entity` classes, we can move on to see how to actually execute the workflow.
+
+For first, it is necessary to generate the .jar files to start Docker:
+```sh
+$ mvn clean package
+$ docker compose build
+$ docker compose up
+```
+At this point navigate to 
+[http://localhost:1234/](http://localhost:1234/): here there is the **Conductor UI** as shown in the image below.
+
+<div style="text-align: center">
+    <img src="/slides/images/conductor_ui.png" alt="Conductor UI">
+</div>
+
+At the firt access, we need to save the workflow and tasks definitions. To do this click on *Definitions* and then on *New Workflow Definition* and *New Task Defintion*. The only things to do is copy and paste the JSON files defined before and click *Save*. See the image below:
+
+<div style="text-align: center">
+    <img src="/slides/images/def_workflow.png" alt="Workflow Definition">
+</div>
+
+To run the workflow, there is a section called ***Workbech***. 
+
+<div style="text-align: center">
+    <img src="/slides/images/workbench.png" alt="workbench">
+</div>
+
+Here, you can select which workflow execute and the set the input parameter. Once the configuration is ready click *Play*.
+
+## Run Services without Docker
+
+In this case, Conductor runs on Docker, but the services run locally. There is only one thing to remember: we have to change the Conductor url. So, the only line of code to change is the following one:
+
+```java
+taskClient.setRootURI("http://conductor:8080/api/");
+```
+and must be rewrite with:
+```java
+taskClient.setRootURI("http://localhost:8080/api/");
+```
+The rest of execution remain unchanged.
 
 ## References
 
