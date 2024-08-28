@@ -5,7 +5,7 @@ import java.util.Objects;
 import javax.persistence.*;
 
 @Entity
-public class ProductChart {
+public class ProductCart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,13 +19,13 @@ public class ProductChart {
     private String description;
 
 
-    public ProductChart(String code, String name, String description) {
+    public ProductCart(String code, String name, String description) {
         this.code = code;
         this.name = name;
         this.description = description;
     }
 
-    public ProductChart() {
+    public ProductCart() {
     }
 
     public Long getId() {
@@ -73,7 +73,7 @@ public class ProductChart {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        ProductChart other = (ProductChart) obj;
+        ProductCart other = (ProductCart) obj;
         if (code == null) {
             if (other.code != null)
                 return false;

@@ -1,6 +1,6 @@
 package com.baeldung.lsd;
 
-import com.baeldung.lsd.persistence.repository.ProductChartRepository;
+import com.baeldung.lsd.persistence.repository.ProductCartRepository;
 import com.baeldung.lsd.worker.ChartDeleteWorker;
 import com.baeldung.lsd.worker.ChartInsertWorker;
 import com.baeldung.lsd.worker.CreditCardWorker;
@@ -19,16 +19,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @SpringBootApplication
-public class ChartSetupApp implements ApplicationRunner {
+public class CartSetupApp implements ApplicationRunner {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ChartSetupApp.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CartSetupApp.class);
     @Autowired
-    private ProductChartRepository productChartRepository;
+    private ProductCartRepository productCartRepository;
 
 
     public static void main(final String... args) {
 
-        SpringApplication.run(ChartSetupApp.class, args);
+        SpringApplication.run(CartSetupApp.class, args);
     }
 
     @Override
@@ -39,9 +39,9 @@ public class ChartSetupApp implements ApplicationRunner {
         int threadCount = 1; // number of threads used to execute workers.  To avoid starvation, should be
 
 
-        Worker worker1 = new ChartInsertWorker("insert_product_in_the_chart", productChartRepository);
+        Worker worker1 = new ChartInsertWorker("insert_product_in_the_chart", productCartRepository);
         Worker worker2 = new CreditCardWorker("check_credit_card");
-        Worker worker3 = new ChartDeleteWorker("chart_delete_product", productChartRepository);
+        Worker worker3 = new ChartDeleteWorker("chart_delete_product", productCartRepository);
 
         Collection workerArrayList = new ArrayList<Worker>();
         workerArrayList.add(worker1);

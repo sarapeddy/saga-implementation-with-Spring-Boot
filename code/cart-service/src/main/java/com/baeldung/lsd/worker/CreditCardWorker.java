@@ -1,14 +1,9 @@
 package com.baeldung.lsd.worker;
 
-import com.baeldung.lsd.persistence.model.ProductChart;
-import com.baeldung.lsd.persistence.repository.ProductChartRepository;
 import com.netflix.conductor.client.worker.Worker;
 import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import org.springframework.beans.factory.annotation.Value;
-
-
-import java.util.Optional;
 
 public class CreditCardWorker implements Worker {
 

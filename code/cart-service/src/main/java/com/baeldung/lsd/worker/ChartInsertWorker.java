@@ -1,21 +1,18 @@
 package com.baeldung.lsd.worker;
 
-import com.baeldung.lsd.persistence.model.ProductChart;
-import com.baeldung.lsd.persistence.repository.ProductChartRepository;
+import com.baeldung.lsd.persistence.model.ProductCart;
+import com.baeldung.lsd.persistence.repository.ProductCartRepository;
 import com.netflix.conductor.client.worker.Worker;
 import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import org.springframework.beans.factory.annotation.Value;
 
-
-import java.util.Optional;
-
 public class ChartInsertWorker implements Worker {
 
     private final String taskDefName;
-    private final ProductChartRepository productChartRepository;
+    private final ProductCartRepository productChartRepository;
 
-    public ChartInsertWorker(@Value("taskDefName") String taskDefName, ProductChartRepository productChartRepository) {
+    public ChartInsertWorker(@Value("taskDefName") String taskDefName, ProductCartRepository productChartRepository) {
         System.out.println("TaskDefName: " + taskDefName);
         this.taskDefName = taskDefName;
         this.productChartRepository = productChartRepository;
@@ -37,7 +34,7 @@ public class ChartInsertWorker implements Worker {
         System.out.println("Name: " + name);
         System.out.println("Description: " + description);
 
-        ProductChart product = new ProductChart(code, name, description);
+        ProductCart product = new ProductCart(code, name, description);
 
         productChartRepository.save(product);
 

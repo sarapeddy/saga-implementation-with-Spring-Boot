@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ywdrtt</groupId>
-    <artifactId>chart-service</artifactId>
+    <artifactId>cart-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>conductor</name>
     <description>Demo project for Conductor</description>
