@@ -5,7 +5,7 @@
 The *SAGA design pattern* is a software architectural pattern used to manage complex, long-running transactions across multiple microservices or distributed systems. In a SAGA, a sequence of smaller, isolated transactions is executed step by step. Each transaction is managed by a separate microservice and, if one transaction fails, the pattern ensures the execution of compensating transactions to undo the effects of the preceding steps, thereby maintaining data consistency. This approach is particularly useful in microservices architectures where a single monolithic transaction is not feasible due to the distributed nature of the system. 
 
 In a microservices architecture, traditional ACID (Atomicity, Consistency, Isolation, Durability) transactions become challenging to implement because they rely on a single, centralized database to ensure data consistency across multiple operations. However, in a microservices environment, data is typically distributed across multiple services, each with its own database. This distribution makes it difficult to maintain ACID properties across service boundaries, particularly **isolation**, which ensures that transactions do not interfere with each other.As a result, an application must use what are known as *countermeasures*, design techniques that prevent or reduce the impact of concurrency anomalies caused by the lack of
-isolation. This topic and how to address its will be discussed in more detail later in the notebook.
+isolation. This topic and how to address it will be discussed in more detail later in the notebook.
 
 
 ## Anomalies that the lack of isolation can cause
@@ -16,8 +16,8 @@ The lack of isolation, as mentioned at the beginning, can cause the three follow
 
 - **Dirty Reads**: This happens when a saga reads data that is currently being updated by another saga that hasn't yet completed its transaction. This can lead to decisions based on incomplete or incorrect data, potentially causing significant issues like exceeding credit limits or making unauthorized changes.
 
-- **Fuzzy/nonrepeatable reads**: Two different steps of a saga read the same data and
-get different results because another saga has made updates
+- **Fuzzy/nonrepeatable reads**: It happens when two different steps of a saga read the same data and
+get different results because another saga has made updates.
 
 ## How to solve the lack of isolation problem
 
@@ -58,7 +58,7 @@ The dashed box around these services indicates the need for data consistency whe
 
 ## How can we implement SAGA Pattern?
 
-To implement the SAGA pattern, two primary approaches can be utilized:
+The alternative to the distributed transactions is SAGA PAttern. To implement it, two primary approaches can be utilized:
 
 - **Choreography**: In this approach, each service involved in the saga performs its local transaction and then publishes an event to signal other services that the next step can proceed. This method is decentralized, with services reacting to events and executing their respective tasks. While choreography can simplify the design by eliminating the need for a central controller, it may lead to increased complexity as the number of interactions grows, making the overall process harder to manage and understand.
 
