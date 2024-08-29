@@ -1,4 +1,4 @@
-# SAGA Pattern - implementation with Orkes Conductor
+# SAGA Pattern - implementation with Conductor
 
 In this notebook, we discuss the implementation of the SAGA pattern using Spring Boot. As mentioned [here](/saga_theory.md), there are two approaches to implementing the pattern: **choreography** or **orchestration**. Considering the characteristics of both, implementing SAGA Pattern using an orchestrator is definitely a better choice, at least in our context. In the following sections, each step required to achieve the proposed result in the [project](../code/) is explained in detail.
 
