@@ -5,7 +5,7 @@ In this notebook, we discuss the implementation of the SAGA pattern using Spring
 
 ## Project structure
 
-A typical example of a microservices architecture is e-commerce platforms where purchases can be made. For this reason, the implemented project features a system composed of three microservices implemented with Spring Boot, each with a specific function, which together create a simplified version of an e-commerce site:
+The final goal we want to reach in this project is the implementation of SAGA Pattern with Spring Boot. To do this, we need an example project composed of some microservices.  A typical example of a microservices architecture is e-commerce platforms where purchases can be made. Each microservice takes care of a particular task, and overall the system works cooperatively to keep data up-to-date and consistent. For this reason, the implemented project features a system composed of three microservices implemented with Spring Boot, each with a specific function, which together create a simplified version of an e-commerce site. The three microservices involved are:
 
 - `warehouse-service`, which handle the products in the warehouse;
 
@@ -13,9 +13,9 @@ A typical example of a microservices architecture is e-commerce platforms where 
 
 - `purchase-service`, which handle the purchased products.
 
-As orchestrator, we will use **Conductor** because it is easily deployable via a Docker container and has an intuitive graphical interface. This interface allows us to define workflows, manage invocations, and configure the tasks. We will explore these aspects in more detail as we proceed.
+As previously said, SAGA Pattern needs an orchestrator. To simulate it, we will use **Conductor** because it is an orchestrator easily deployable via a Docker container and has an intuitive graphical interface. This interface allows us to define workflows, manage invocations, and configure the tasks. We will explore these aspects in more detail as we proceed.
 
-In our implementation, the Product has four attributes:
+In our implementation, each microservice has its own database able to store Products. Each product is stored with four attributes:
 - *id*: the auto generated primary key;
 - *code*: an unique attribute used as an alternative key;
 - *name*: the product name;
@@ -23,16 +23,18 @@ In our implementation, the Product has four attributes:
 
 The interaction with the database (*Postgres*) is handles by Java JPA to avoid the SQL writing.
 
+Overall, we have an architecture consisting of three microservices, each with its associated database that stores product information, along with an orchestrator that will manage the interactions between them.
+
 ## The workflow to implement
 
 To ensure that the orchestrator can manage transactions across each microservice's database and keep the data consistent, workflows must be defined. This allows the orchestrator to know how to handle the various situations that may arise.
 
 
 <div style="text-align: center">
-    <img src="/slides/images/workflow.png" alt="workflow " width="300" height="600">
+    <img src="/slides/images/workflow.png" alt="workflow " width="250" height="600">
 </div>
 
-We previously mentioned that our project aims to simulate an e-commerce platform, so every product (before the sale) must do some checks. For instance it is important to verify if a number of credit card is valid. The workflow shown at the beginning represents the steps a product must go through before being sold. Essentially, a workflow in Conductor environment is an implementation of an activity diagram, consisting of a series of tasks to be executed in sequence. Specifically, our workflow want to represent the product sale process. It includes:
+We previously mentioned that our project aims to simulate an e-commerce platform, so every product (before the sale) must do some checks. For instance it is important to verify if a number of credit card is valid. The workflow previously shown represents the steps a product must go through before being sold. Essentially, a workflow in Conductor environment is an implementation of an activity diagram, consisting of a series of tasks to be executed in sequence. Specifically, our workflow want to represent the product sale process. It includes:
 
 1. Removing the product from the warehouse.
 
@@ -106,7 +108,7 @@ The complete implementation of our workflow is provided in the file `buy_product
 
 ## Task definition with Conductor
 
-When defining tasks, there are two main steps to follow:
+Each workflow is composed of a set of task. Each of them must be defined. To do this, there are two main steps to follow:
 
 1. Define the task characteristics using a JSON file.
 
@@ -114,7 +116,7 @@ When defining tasks, there are two main steps to follow:
 
 ### 1. Task Definition with JSON File
 
-For each task, just like for each workflow, you need to define not only the name but also any associated **metadata**. These typically follow a standard configuration that doesn’t require many modification. Below it is reported an example that corresponds to the `check_credit_card` task in our workflow:
+For each task, just like for each workflow, we need to define not only the name but also any associated **metadata**. These typically follow a standard configuration that doesn’t require many modification. Below it is reported an example that corresponds to the `check_credit_card` task in our workflow:
 
 ```json
 {
@@ -144,7 +146,8 @@ For each task, just like for each workflow, you need to define not only the name
 
 The JSON files for each task present in the considered microservice can be found in the `/resources/task` directory.
 
-When it comes to defining the task in Java, you simply need to implement a class following this structure:
+### 2. Java implementation
+When it comes to defining the task in Java, we simply need to implement a class following this structure:
 
 ```java
 package com.baeldung.lsd.worker;
@@ -192,16 +195,12 @@ Typically, it is considered a best practice to place the implementation of Worke
 It is also necessary to instantiate the Worker when the service starts. So, every *main* class must be as follows:
 
 ```java
-
 @SpringBootApplication
-public class PurchaseSetupApp implements ApplicationRunner {
-
-    @Autowired
-    private ProductPurchaseRepository productPurchaseRepository;
-    ...
+public class CartSetupApp implements ApplicationRunner {
+    ....
 
     public static void main(final String... args) {
-        SpringApplication.run(PurchaseSetupApp.class, args);
+        SpringApplication.run(CartSetupApp.class, args);
     }
 
     @Override
@@ -210,11 +209,12 @@ public class PurchaseSetupApp implements ApplicationRunner {
         taskClient.setRootURI("http://conductor:8080/api/"); // Point this to the server API
 
         int threadCount = 1; // number of threads used to execute workers.  To avoid starvation, should be
-
-        Worker worker1 = new PurchaseInsertWorker("product_sale", productPurchaseRepository);
+        Worker worker = new CreditCardWorker("check_credit_card");
+        ...
 
         Collection workerArrayList = new ArrayList<Worker>();
-        workerArrayList.add(worker1);
+        workerArrayList.add(worker);
+        ...
 
         TaskRunnerConfigurer configurer =
                 new TaskRunnerConfigurer.Builder(taskClient, workerArrayList)
@@ -222,18 +222,14 @@ public class PurchaseSetupApp implements ApplicationRunner {
                         .build();
         // Start the polling and execution of tasks
         configurer.init();
-
-        LOG.info("Starting Spring Boot application...");
     }
-
 }
-
 ```
 
 
 ## How to execute the workflow with Docker
 
-Now that we have defined the workflow (both theoretically and practically), as well as the tasks and written the code to manage the JPA `@Entity` classes, we can move on to see how to actually execute the workflow.
+Now that we have defined the workflow (both theoretically and practically), as well as the tasks and written the code to manage the JPA `@Entity` classes, we can move on to see how to actually execute the workflow (the database implementation isn't treated in this notebook because it is already known - see JPA reference or the project code).
 
 For first, it is necessary to generate the .jar files to start Docker:
 ```sh
@@ -262,12 +258,56 @@ To run the workflow, there is a section called ***Workbech***.
 
 Here, you can select which workflow execute and the set the input parameter. Once the configuration is ready click *Play*.
 
+In our case, there are three main cases we can run to verify how workflow works:
+
+1. Insert a correct *productCode* and *creditCard*:
+    ```json
+    {
+      "productCode": "P7",
+      "creditCard": "1234567891234567"
+    }
+    ```
+   
+2. Insert a correct *productCode* and incorrect *creditCard*:
+   ```json
+    {
+      "productCode": "P7",
+      "creditCard": "123456789"
+    }
+    ```
+   
+4. Insert a *pruductCode* that does not exist:
+   ```json
+    {
+      "productCode": "False Code",
+      "creditCard": "1234567891234567"
+    }
+    ```
+
+**Note**: In this simplified implementation, the credit card number is considered invalid if it is not 16 digits long.
+
+For the first case, we will see that the workflow successed moving the product "P7" from the warehouse product tablet to the purchase product table. For the second case, the product "P7" remains in cart product table because the credit card is invalid. In the end, in the third case the workflow failed.
+
 ## How can to see the execution results
 
-In Conductor UI there is also another section called ***Executions**. Inside it is possible to see the results of every workflow executed and analyze the input/output parameters. It is very useful for debugging stuff. 
+In Conductor UI there is also another section called ***Executions***. Inside it is possible to see the results of every workflow executed and analyze the input/output parameters. It is very useful for debugging stuff. 
+
 <div style="text-align: center">
     <img src="/slides/images/executions.png" alt="executions tab">
 </div>
+
+## How to check the elements in the database
+
+Since the SAGA Pattern allows for managing elements in the database, it's important to note that the project dependencies include the H2 database:
+
+```html
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+</dependency>
+```
+
+This provides a user-friendly graphical interface to query the implemented Postgres database. From the desired service, simply navigate to the URI `/h2-console` and enter the desired SQL in the appropriate field.
 
 ## Run Services without Docker
 
