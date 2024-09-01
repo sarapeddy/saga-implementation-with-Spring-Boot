@@ -48,7 +48,7 @@ Although distributed transactions offer a familiar programming model similar to 
 
 ![Distribution transaction](/slides/images/distri_trans.png)
 
-In the image there is an example of what we have mentioned at the beginning of the pragraph. It illustrates `createOrder()` operation in a microservices architecture. This operation involves multiple services and must ensure data consistency across them. The diagram shows the `Order Service`, `Consumer Service`, `Kitchen Service`, and `Accounting Service`, each represented by hexagons. 
+In the image there is an example of what we have mentioned at the beginning of the paragraph. It illustrates `createOrder()` operation in a microservices architecture. This operation involves multiple services and must ensure data consistency across them. The diagram shows the `Order Service`, `Consumer Service`, `Kitchen Service`, and `Accounting Service`, each represented by hexagons. 
 
 - The `Order controller` initiates the `createOrder()` process.
 - The `Order Service` reads data from the `Consumer Service`, which manages consumer information.
