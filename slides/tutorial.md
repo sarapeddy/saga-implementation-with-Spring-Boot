@@ -9,7 +9,7 @@ The final goal we want to reach in this project is the implementation of SAGA Pa
 
 - `warehouse-service`, which handle the products in the warehouse;
 
-- `cart-service`, which handle the products in the chart;
+- `cart-service`, which handle the products in the cart;
 
 - `purchase-service`, which handle the purchased products.
 
@@ -21,7 +21,7 @@ In our implementation, each microservice has its own database able to store Prod
 - *name*: the product name;
 - *description*: the product description.
 
-The interaction with the database (*Postgres*) is handles by Java JPA to avoid the SQL writing.
+The interaction with the database (*Postgres*) is handled by Java JPA to avoid the SQL writing.
 
 Overall, we have an architecture consisting of three microservices, each with its associated database that stores product information, along with an orchestrator that will manage the interactions between them.
 
@@ -29,7 +29,7 @@ Overall, we have an architecture consisting of three microservices, each with it
 
 **Conductor** is a workflow orchestration framework, developed by Netflix, that allows for managing complex processes within microservices architectures. Conductor enables the definition of workflows as a sequence of independent tasks, each executed by a different microservice, ensuring scalability, resilience, and control. With support for various programming languages and integration with numerous technologies, Conductor is ideal for automating and orchestrating distributed processes efficiently. 
 
-In our context it is necessary to add a dependencies in `pom.xml` to enable every interested microservices to interact with it:
+In our context it is necessary to add dependencies in `pom.xml` to enable every interested microservices to interact with it:
 
 ```html
 <dependency>
@@ -63,7 +63,7 @@ We previously mentioned that our project aims to simulate an e-commerce platform
 
 2. Adding the product to the cart.
 
-3. Verifying the credit card number to decide whether to proceed with removing the item from the chart and completing the sale, or to simply keep the item in the cart if payment cannot be processed.
+3. Verifying the credit card number to decide whether to proceed with removing the item from the cart and completing the sale, or to simply keep the item in the cart if payment cannot be processed.
 
 Furthermore, it takes two parameters as input:
 
@@ -89,7 +89,7 @@ Before diving into the implementation details, it's helpful to review the Docker
 
 ## Workflow definition with Conductor
 
-Once the theoretical aspects of the workflow are defined, including its tasks, input and output parameters, and so on, it's time to move on to the implementation using Conductor. Conductor uses a JSON file to define a workflow. It becomes a one-to-one translation of what was previously done with some more information treated as metadata. These ones are very important because they specify task lifecycle, how many times a task must be retry in case of fall and so on. The basic structure of the JSON file becomes as follows:
+Once the theoretical aspects of the workflow are defined, including its tasks, input and output parameters, and so on, it's time to move on to the implementation using Conductor. Conductor uses a JSON file to define a workflow. It becomes a one-to-one translation of what was previously done with some more information treated as metadata. These ones are very important because they specify task lifecycle, how many times a task must be retried in case of fall and so on. The basic structure of the JSON file becomes as follows:
 
 ```json
 {
@@ -364,7 +364,7 @@ curl -X POST http://localhost:8080/api/workflow/<example-workflow> \
          }'
 ```
 
-Replace `<example-workflow` with the name of the workflow you want to execute. This command sends a `POST` request to start the specified workflow, including any necessary input parameters in the JSON payload.
+Replace `<example-workflow>` with the name of the workflow you want to execute. This command sends a `POST` request to start the specified workflow, including any necessary input parameters in the JSON payload.
 
 ## References
 
