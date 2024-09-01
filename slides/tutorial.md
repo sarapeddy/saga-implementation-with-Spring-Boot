@@ -25,6 +25,29 @@ The interaction with the database (*Postgres*) is handles by Java JPA to avoid t
 
 Overall, we have an architecture consisting of three microservices, each with its associated database that stores product information, along with an orchestrator that will manage the interactions between them.
 
+## Conductor Overview
+
+**Conductor** is a workflow orchestration framework, developed by Netflix, that allows for managing complex processes within microservices architectures. Conductor enables the definition of workflows as a sequence of independent tasks, each executed by a different microservice, ensuring scalability, resilience, and control. With support for various programming languages and integration with numerous technologies, Conductor is ideal for automating and orchestrating distributed processes efficiently. 
+
+In our context it is necessary to add a dependencies in `pom.xml` to enable every interested microservices to interact with it:
+
+```html
+<dependency>
+    <groupId>com.netflix.conductor</groupId>
+    <artifactId>conductor-client</artifactId>
+    <version>3.8.1</version>
+</dependency>
+
+<dependency>
+    <groupId>com.netflix.conductor</groupId>
+    <artifactId>conductor-common</artifactId>
+    <version>3.8.1</version>
+</dependency>
+```
+
+The `conductor-client` dependency provides the client API for interacting with Netflix Conductor, a microservices orchestration framework. This library allows developers to create, manage, and execute workflows and tasks within Conductor from their Java applications. The `conductor-common` dependency contains shared components and utilities that are used across various Conductor modules. This includes common data models, utility classes, and configurations that are essential for building and integrating with Conductor. It is typically used in conjunction with the conductor-client to provide a consistent and reusable set of tools for working with Conductor workflows.
+
+
 ## The workflow to implement
 
 To ensure that the orchestrator can manage transactions across each microservice's database and keep the data consistent, workflows must be defined. This allows the orchestrator to know how to handle the various situations that may arise.
@@ -321,6 +344,27 @@ and must be rewrite with:
 taskClient.setRootURI("http://localhost:8080/api/");
 ```
 The rest of execution remains unchanged.
+
+## Execute a workflow with ***curl***
+
+In Netflix Conductor, you can trigger the execution of a workflow not only through the Conductor UI but also via an HTTP request. This capability allows you to programmatically start workflows, making it easier to integrate Conductor into automated processes or other applications.
+
+Here's an example of how to trigger a workflow using an HTTP request with `curl`:
+
+```bash
+curl -X POST http://localhost:8080/api/workflow/<example-workflow> \
+     -H "Content-Type: application/json" \
+     -d '{
+           "name": "<example-workflow>",
+           "version": 1,
+           "input": {
+             "productCode": "P7",
+             "creditCard": "1234567891234567"
+           }
+         }'
+```
+
+Replace `<example-workflow` with the name of the workflow you want to execute. This command sends a `POST` request to start the specified workflow, including any necessary input parameters in the JSON payload.
 
 ## References
 
